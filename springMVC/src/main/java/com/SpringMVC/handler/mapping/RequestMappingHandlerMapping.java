@@ -3,7 +3,6 @@ package com.SpringMVC.handler.mapping;
 import com.SpringMVC.annotation.RequestMapping;
 import org.springframework.beans.factory.BeanFactoryUtils;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.support.ApplicationObjectSupport;
 import org.springframework.core.MethodIntrospector;
 import org.springframework.core.annotation.AnnotatedElementUtils;
@@ -16,7 +15,7 @@ import java.util.Map;
  * @author ZhangYihe
  * @since 2025/2/15
  **/
-public class RequsetMappingHandlerMapping extends ApplicationObjectSupport implements HandlerMapping, InitializingBean {
+public class RequestMappingHandlerMapping extends ApplicationObjectSupport implements HandlerMapping, InitializingBean {
     private MappingRegistry mappingRegistry=new MappingRegistry();
 
     /**
@@ -53,7 +52,7 @@ public class RequsetMappingHandlerMapping extends ApplicationObjectSupport imple
     private void detectHandlerMethods(String beanName,Object handler){
         Class<?> beanType=handler.getClass();
         //获取handler中的所有方法，并对方法调用getMappingForMethod(),获取RequestMappingInfo
-        Map<Method,RequestMappingInfo> methodsOfMap= MethodIntrospector.selectMethods(beanType,
+        Map<Method, RequestMappingInfo> methodsOfMap= MethodIntrospector.selectMethods(beanType,
                 (MethodIntrospector.MetadataLookup<RequestMappingInfo>) method->getMappingForMethod(method,beanType));
 
         for(Method method: methodsOfMap.keySet()){
@@ -79,6 +78,23 @@ public class RequsetMappingHandlerMapping extends ApplicationObjectSupport imple
                 BeanFactoryUtils.beansOfTypeIncludingAncestors(obtainApplicationContext(),Object.class);
         for(String beanName: beansMap.keySet()){
             Object bean=beansMap.get(beanName);
+            //测试
+//            if(beanName.equals("indexController")||beanName.equals("testController")){
+//                Map<Method, Object> methods = MethodIntrospector.selectMethods(bean.getClass(),
+//                        (MethodIntrospector.MetadataLookup<Object>) method -> {
+//                            // 这里可以根据需要返回方法的元数据
+//                            return method.getName(); // 返回方法名
+//                        });
+//
+//                // 打印所有方法名
+//                methods.forEach((method, name) -> {
+//                    System.out.println("Method name: " + name);
+//                });
+//            }
+
+
+            //测试
+
             if(isHandler(bean)){
                 detectHandlerMethods(beanName,bean);
             }

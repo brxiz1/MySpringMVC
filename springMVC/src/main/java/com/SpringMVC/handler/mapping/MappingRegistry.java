@@ -51,7 +51,7 @@ public class MappingRegistry {
      * @param path url
      * @return
      */
-    public RequestMappingInfo getRequestMappingInfoByPath(String path){
+    public RequestMappingInfo getMappingByPath(String path){
         return pathMappingInfo.get(path);
     }
 
