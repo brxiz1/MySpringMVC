@@ -27,7 +27,7 @@ public class HandlerExecutionChain {
 
     public HandlerExecutionChain(HandlerMethod handler, List<HandlerInterceptor> interceptors){
         this.handler=handler;
-        if(CollectionUtils.isEmpty(interceptors)){
+        if(!CollectionUtils.isEmpty(interceptors)){
             this.interceptors=interceptors;
         }
 
@@ -38,7 +38,7 @@ public class HandlerExecutionChain {
      * @param request
      * @param response
      */
-    public boolean applyPreHandle(HttpServletRequest request, HttpServletResponse response){
+    public boolean applyPreHandle(HttpServletRequest request, HttpServletResponse response) throws Exception {
         if(CollectionUtils.isEmpty(interceptors)){
             return true;
         }
@@ -60,7 +60,7 @@ public class HandlerExecutionChain {
      */
     public void applyPostHandle(HttpServletRequest request,
                                 HttpServletResponse response,
-                                ModelAndView modelAndView){
+                                ModelAndView modelAndView) throws Exception {
         if(CollectionUtils.isEmpty(interceptors)){
             return ;
         }
@@ -77,7 +77,7 @@ public class HandlerExecutionChain {
      */
     public void triggerAfterCompletion(HttpServletRequest request,
                                        HttpServletResponse response,
-                                       Exception exception){
+                                       Exception exception) throws Exception {
         if(CollectionUtils.isEmpty(interceptors)){
             return;
         }

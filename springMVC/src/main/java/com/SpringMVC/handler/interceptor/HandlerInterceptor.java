@@ -24,7 +24,7 @@ public interface HandlerInterceptor {
      */
     boolean preHandle(HttpServletRequest request,
                       HttpServletResponse response,
-                      Object handler);
+                      Object handler) throws Exception;
 
     /**
      * handler处理后执行本方法
@@ -37,7 +37,7 @@ public interface HandlerInterceptor {
     void postHandle(HttpServletRequest request,
                        HttpServletResponse response,
                        Object handler,
-                       ModelAndView modelAndView);
+                       ModelAndView modelAndView) throws Exception;
 
     /**
      * 有很多执行场景，Interceptor处理结束后执行
@@ -49,5 +49,7 @@ public interface HandlerInterceptor {
     void afterCompletion(HttpServletRequest request,
                          HttpServletResponse response,
                          Object handler,
-                         Exception exception);
+                         Exception exception) throws Exception;
+
+
 }

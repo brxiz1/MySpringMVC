@@ -69,7 +69,7 @@ public class MappedInterceptor implements HandlerInterceptor{
     }
 
     @Override
-    public boolean preHandle(HttpServletRequest request, HttpServletResponse response,Object handler) {
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response,Object handler) throws Exception {
         return interceptor.preHandle(request,response,handler);
     }
 
@@ -77,7 +77,7 @@ public class MappedInterceptor implements HandlerInterceptor{
     public void postHandle(HttpServletRequest request,
                            HttpServletResponse response,
                            Object handler,
-                           @Nullable ModelAndView modelAndView) {
+                           @Nullable ModelAndView modelAndView) throws Exception {
         interceptor.postHandle(request,response,handler,modelAndView);
     }
 
@@ -85,7 +85,11 @@ public class MappedInterceptor implements HandlerInterceptor{
     public void afterCompletion(HttpServletRequest request,
                                 HttpServletResponse response,
                                 Object handler,
-                                @Nullable Exception exception) {
+                                @Nullable Exception exception) throws Exception {
         interceptor.afterCompletion(request,response,handler,exception);
+    }
+
+    public HandlerInterceptor getInterceptor() {
+        return interceptor;
     }
 }
