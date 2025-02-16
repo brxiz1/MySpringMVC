@@ -150,7 +150,7 @@ public class RequestMappingHandlerMapping extends ApplicationObjectSupport imple
         //注意这里需要的剔除协议头部(http:....)的url
         String uri=request.getRequestURI();
         HandlerMethod handler=mappingRegistry.getHandlerMethodByPath(uri);
-        if(uri==null){
+        if(handler==null){
             throw new NoHandlerFoundException(request);
         }
         return createExecutionChain(uri,handler);
