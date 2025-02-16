@@ -1,6 +1,11 @@
 package com.SpringMVC.handler.mapping;
 
 import com.SpringMVC.annotation.RequestMapping;
+import com.SpringMVC.handler.HandlerExecutionChain;
+import com.SpringMVC.handler.HandlerMethod;
+import com.SpringMVC.handler.exception.NoHandlerFoundException;
+import com.SpringMVC.handler.interceptor.HandlerInterceptor;
+import com.SpringMVC.handler.interceptor.MappedInterceptor;
 import org.springframework.beans.factory.BeanFactoryUtils;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.support.ApplicationObjectSupport;
@@ -8,7 +13,11 @@ import org.springframework.core.MethodIntrospector;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.stereotype.Controller;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -16,7 +25,15 @@ import java.util.Map;
  * @since 2025/2/15
  **/
 public class RequestMappingHandlerMapping extends ApplicationObjectSupport implements HandlerMapping, InitializingBean {
+    /**
+     * HandlerMapping和RequestMapping的注册中心
+     */
     private MappingRegistry mappingRegistry=new MappingRegistry();
+
+    /**
+     * 所有已注册的interceptor
+     */
+    private List<MappedInterceptor> interceptorList=new ArrayList<>();
 
     /**
      * 获取Controller的@Requestmapping注解中的url前缀
@@ -110,7 +127,53 @@ public class RequestMappingHandlerMapping extends ApplicationObjectSupport imple
         initialHandlerMethods();
     }
 
+    /**
+     * 获取HandlerMapping注册中心
+     * @return
+     */
     public MappingRegistry getMappingRegistry() {
         return mappingRegistry;
     }
+
+    public void setInterceptors(List<MappedInterceptor> interceptors){
+        interceptorList=interceptors;
+    }
+
+    /**
+     * 从请求映射到对应的处理链
+     * @param request
+     * @return
+     */
+    public HandlerExecutionChain getHandler(HttpServletRequest request) throws NoHandlerFoundException {
+
+//        String url= String.valueOf(request.getRequestURL());
+        //注意这里需要的剔除协议头部(http:....)的url
+        String uri=request.getRequestURI();
+        HandlerMethod handler=mappingRegistry.getHandlerMethodByPath(uri);
+        if(uri==null){
+            throw new NoHandlerFoundException(request);
+        }
+        return createExecutionChain(uri,handler);
+    }
+
+    /**
+     * 根据url和handler创建对应的处理链
+     * @param path
+     * @param handler
+     * @return
+     */
+    private HandlerExecutionChain createExecutionChain(String path, HandlerMethod handler){
+        //构造HandlerExecutionChain使用HandlerInterceptor对象
+        // 而不是MappedInterceptor，因为由path获取interceptor的功能到此为止，不再需要
+        List<HandlerInterceptor> interceptors=new ArrayList<>();
+        for(MappedInterceptor interceptor:interceptorList){
+            if(interceptor==null)continue;
+            if(interceptor.matches(path)){
+                interceptors.add(interceptor);
+            }
+        }
+
+        return new HandlerExecutionChain(handler,interceptors);
+    }
+
 }
