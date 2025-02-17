@@ -7,6 +7,10 @@ import javax.servlet.http.HttpServletRequest;
  * @author ZhangYihe
  * @since 2025/2/16
  **/
+
+/**
+ * 没有找到能匹配URL的handler
+ */
 public class NoHandlerFoundException extends Exception{
     /**
      * GET\POST

@@ -1,11 +1,13 @@
 package com.SpringMVC.handler.argument;
 
 import com.SpringMVC.handler.ModelAndViewContainer;
+import com.SpringMVC.handler.exception.MissingServletRequestParameterException;
 import org.springframework.core.MethodParameter;
 import org.springframework.core.convert.ConversionService;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
 /**
  * @author ZhangYihe
@@ -36,5 +38,5 @@ public interface HandlerMethodArgumentResolver {
                            HttpServletRequest request,
                            HttpServletResponse response,
                            ModelAndViewContainer container,
-                           ConversionService service);
+                           ConversionService service) throws MissingServletRequestParameterException, IOException;
 }
