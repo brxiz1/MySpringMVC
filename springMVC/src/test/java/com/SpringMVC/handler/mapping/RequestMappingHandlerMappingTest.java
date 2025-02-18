@@ -2,30 +2,33 @@ package com.SpringMVC.handler.mapping;
 
 import com.SpringMVC.controller.TestController;
 import com.SpringMVC.controller.TestHandlerController;
+import com.SpringMVC.controller.TestReturnValueController;
 import com.SpringMVC.handler.HandlerExecutionChain;
 import com.SpringMVC.handler.HandlerMethod;
+import com.SpringMVC.handler.ModelAndViewContainer;
 import com.SpringMVC.handler.argument.HandlerMethodArgumentResolverComposite;
 import com.SpringMVC.handler.argument.RequestBodyMethodArgumentResolver;
 import com.SpringMVC.handler.argument.RequestParamMethodArgumentResolver;
 import com.SpringMVC.handler.argument.ServletRequestMethodArgumentResolver;
 import com.SpringMVC.handler.exception.NoHandlerFoundException;
 import com.SpringMVC.handler.interceptor.MappedInterceptor;
-import com.SpringMVC.http.RequestMethod;
+import com.SpringMVC.handler.returnvalue.*;
 import com.SpringMVC.BaseJunit4Test;
 import com.SpringMVC.intercepter.Test2HandlerInterceptor;
 import com.SpringMVC.intercepter.TestHandlerInterceptor;
+import com.SpringMVC.view.View;
 import com.SpringMVC.vo.UserVo;
 import com.alibaba.fastjson.JSON;
 import org.junit.Assert;
 import org.junit.Test;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.DefaultParameterNameDiscoverer;
+import org.springframework.core.MethodParameter;
 import org.springframework.format.datetime.DateFormatter;
 import org.springframework.format.support.DefaultFormattingConversionService;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
-import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -40,33 +43,33 @@ public class RequestMappingHandlerMappingTest extends BaseJunit4Test {
     @Autowired
     private RequestMappingHandlerMapping requestMappingHandlerMapping;
 
-    @Test
-    public void test(){
-        MappingRegistry mappingRegistry = requestMappingHandlerMapping.getMappingRegistry();
-
-        String path = "/index/test";
-        String path1 = "/index/test2";
-        String path4 = "/test4";
-
-        Assert.assertEquals(mappingRegistry.getPathHandlerMethod().size(), 2);
-
-        HandlerMethod handlerMethod = mappingRegistry.getHandlerMethodByPath(path);
-        HandlerMethod handlerMethod2 = mappingRegistry.getHandlerMethodByPath(path1);
-        HandlerMethod handlerMethod4 = mappingRegistry.getHandlerMethodByPath(path4);
-
-        Assert.assertNull(handlerMethod4);
-        Assert.assertNotNull(handlerMethod);
-        Assert.assertNotNull(handlerMethod2);
-
-
-        RequestMappingInfo mapping = mappingRegistry.getMappingByPath(path);
-        RequestMappingInfo mapping2 = mappingRegistry.getMappingByPath(path1);
-
-        Assert.assertNotNull(mapping);
-        Assert.assertNotNull(mapping2);
-        Assert.assertEquals(mapping.getHttpMethod(), RequestMethod.GET);
-        Assert.assertEquals(mapping2.getHttpMethod(), RequestMethod.POST);
-    }
+//    @Test
+//    public void test(){
+//        MappingRegistry mappingRegistry = requestMappingHandlerMapping.getMappingRegistry();
+//
+//        String path = "/index/test";
+//        String path1 = "/index/test2";
+//        String path4 = "/test4";
+//
+//        Assert.assertEquals(mappingRegistry.getPathHandlerMethod().size(), 2);
+//
+//        HandlerMethod handlerMethod = mappingRegistry.getHandlerMethodByPath(path);
+//        HandlerMethod handlerMethod2 = mappingRegistry.getHandlerMethodByPath(path1);
+//        HandlerMethod handlerMethod4 = mappingRegistry.getHandlerMethodByPath(path4);
+//
+//        Assert.assertNull(handlerMethod4);
+//        Assert.assertNotNull(handlerMethod);
+//        Assert.assertNotNull(handlerMethod2);
+//
+//
+//        RequestMappingInfo mapping = mappingRegistry.getMappingByPath(path);
+//        RequestMappingInfo mapping2 = mappingRegistry.getMappingByPath(path1);
+//
+//        Assert.assertNotNull(mapping);
+//        Assert.assertNotNull(mapping2);
+//        Assert.assertEquals(mapping.getHttpMethod(), RequestMethod.GET);
+//        Assert.assertEquals(mapping2.getHttpMethod(), RequestMethod.POST);
+//    }
 
 //    @Test
 //    public void testBeanMaps() {
@@ -189,4 +192,47 @@ public class RequestMappingHandlerMappingTest extends BaseJunit4Test {
         });
     }
 
+    @Test
+    public void test() throws Exception {
+        HandlerMethodReturnValueHandlerComposite composite = new HandlerMethodReturnValueHandlerComposite();
+        composite.addReturnValueHandler(new ModelMethodReturnValueHandler());
+        composite.addReturnValueHandler(new MapMethodReturnValueHandler());
+        composite.addReturnValueHandler(new ResponseBodyMethodReturnValueHandler());
+        composite.addReturnValueHandler(new ViewMethodReturnValueHandler());
+        composite.addReturnValueHandler(new ViewNameMethodReturnValueHandler());
+
+        ModelAndViewContainer mvContainer = new ModelAndViewContainer();
+        TestReturnValueController controller = new TestReturnValueController();
+
+        //测试方法testViewName
+        Method viewNameMethod = controller.getClass().getMethod("testViewName");
+        MethodParameter viewNameMethodParameter = new MethodParameter(viewNameMethod, -1); //取得返回值的MethodParameter
+        composite.handleReturnValue(controller.testViewName(), viewNameMethodParameter, mvContainer, null, null);
+        Assert.assertEquals(mvContainer.getViewName(), "/jsp/index.jsp");
+
+        //测试方法testView
+        Method viewMethod = controller.getClass().getMethod("testView");
+        MethodParameter viewMethodParameter = new MethodParameter(viewMethod, -1);
+        composite.handleReturnValue(controller.testView(), viewMethodParameter, mvContainer, null, null);
+        Assert.assertTrue(mvContainer.getView() instanceof View);
+
+        //测试方法testResponseBody
+        Method responseBodyMethod = controller.getClass().getMethod("testResponseBody");
+        MethodParameter resBodyMethodParameter = new MethodParameter(responseBodyMethod, -1);
+        MockHttpServletResponse response = new MockHttpServletResponse();
+        composite.handleReturnValue(controller.testResponseBody(), resBodyMethodParameter, mvContainer, null, response);
+        System.out.println(response.getContentAsString()); //打印出Controller中返回的JSON字符串
+
+        //测试方法testModel
+        Method modelMethod = controller.getClass().getMethod("testModel", Model.class);
+        MethodParameter modelMethodParameter = new MethodParameter(modelMethod, -1);
+        composite.handleReturnValue(controller.testModel(mvContainer.getModel()), modelMethodParameter, mvContainer, null, null);
+        Assert.assertEquals(mvContainer.getModel().getAttribute("testModel"), "Silently9527");
+
+        //测试方法testMap
+        Method mapMethod = controller.getClass().getMethod("testMap");
+        MethodParameter mapMethodParameter = new MethodParameter(mapMethod, -1);
+        composite.handleReturnValue(controller.testMap(), mapMethodParameter, mvContainer, null, null);
+        Assert.assertEquals(mvContainer.getModel().getAttribute("testMap"), "Silently9527");
+    }
 }

@@ -6,7 +6,10 @@ package com.SpringMVC.handler;
  **/
 
 import com.SpringMVC.http.HttpStatus;
+import org.springframework.ui.ExtendedModelMap;
 import org.springframework.ui.Model;
+
+import java.util.Objects;
 
 /**
  * 保存Handler处理过程中的Model和View
@@ -36,6 +39,9 @@ public class ModelAndViewContainer {
     }
 
     public Model getModel() {
+        if (Objects.isNull(this.model)) {
+            this.model = new ExtendedModelMap();
+        }
         return model;
     }
 
