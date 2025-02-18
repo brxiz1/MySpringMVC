@@ -5,6 +5,8 @@ import com.SpringMVC.view.View;
 import com.SpringMVC.vo.UserVo;
 import org.springframework.ui.Model;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -29,6 +31,10 @@ public class TestReturnValueController {
 
     public View testView() {
         return new View() {
+            @Override
+            public void render(Map<String, Object> model, HttpServletRequest request, HttpServletResponse response) {
+
+            }
         };
     }
 

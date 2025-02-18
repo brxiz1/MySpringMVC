@@ -15,7 +15,7 @@ import javax.servlet.http.HttpServletResponse;
  **/
 
 /**
- * 解析出model对象，方便对handler中的Model参数进行注入
+ * 从ModelAndViewContainer中提取出model对象，方便对handler中的Model参数进行注入
  */
 public class ModelMethodArgumentResolver implements HandlerMethodArgumentResolver{
     @Override

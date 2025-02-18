@@ -58,7 +58,7 @@ public class InvocableHandlerMethod extends HandlerMethod{
                                                  ModelAndViewContainer mavContainer) throws MissingServletRequestParameterException, IOException {
         Assert.notNull(argumentResolver,"HandlerMethodArgumentResolver can not be null");
         List<MethodParameter> parameters=this.getParameters();
-        //将MethodParameter转为实际的参数
+        //参数解析器处理参数将MethodParameter转为实际的参数
         List<Object> args=new ArrayList<>();
         for(MethodParameter parameter:parameters){
             //解析参数名称

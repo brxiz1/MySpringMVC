@@ -7,6 +7,7 @@ import org.springframework.util.CollectionUtils;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -46,6 +47,9 @@ public class HandlerMethodReturnValueHandlerComposite implements HandlerMethodRe
         Collections.addAll(returnValueHandlerList,handler);
     }
 
+    public void addReturnValueHandler(Collection<HandlerMethodReturnValueHandler> handlers){
+        returnValueHandlerList.addAll(handlers);
+    }
     public void clear(){
         returnValueHandlerList.clear();
     }

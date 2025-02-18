@@ -15,7 +15,7 @@ import java.util.List;
  **/
 
 /**
- * 定义了一个请求的执行链
+ * 定义了一个请求的执行链，执行该请求匹配到的拦截器
  */
 public class HandlerExecutionChain {
     private HandlerMethod handler;
