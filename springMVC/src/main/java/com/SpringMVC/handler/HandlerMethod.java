@@ -55,6 +55,13 @@ public class HandlerMethod {
         }
     }
 
+    public HandlerMethod(HandlerMethod handlerMethod){
+        this.bean=handlerMethod.getBean();
+        beanType=handlerMethod.getBeanType();
+        method= handlerMethod.getMethod();
+        parameters=handlerMethod.getParameters();
+    }
+
     public Object getBean() {
         return bean;
     }
