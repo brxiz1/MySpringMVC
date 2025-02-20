@@ -15,7 +15,7 @@ import java.util.Map;
  */
 public class InternalResourceView extends AbstractView{
     /**
-     * 要求的JSP或HTML资源的位置
+     * 服务端转发的目的url，即要求的JSP或HTML资源的位置
      */
     private String url;
 

@@ -10,7 +10,7 @@ import java.util.Map;
  **/
 public interface View {
     /**
-     * 控制视图支持的ContentType
+     * 获取视图支持的ContentType
      * @return
      */
     default String getContentType() {

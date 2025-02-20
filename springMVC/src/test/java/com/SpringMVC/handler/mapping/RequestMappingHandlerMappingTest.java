@@ -17,8 +17,12 @@ import com.SpringMVC.handler.returnvalue.*;
 import com.SpringMVC.BaseJunit4Test;
 import com.SpringMVC.intercepter.Test2HandlerInterceptor;
 import com.SpringMVC.intercepter.TestHandlerInterceptor;
+import com.SpringMVC.utils.RequestContextHolder;
+import com.SpringMVC.view.InternalResourceView;
 import com.SpringMVC.view.RedirectView;
 import com.SpringMVC.view.View;
+import com.SpringMVC.view.resolver.ContentNegotiatingViewResolver;
+import com.SpringMVC.view.resolver.InternalResourceViewResolver;
 import com.SpringMVC.vo.UserVo;
 import com.alibaba.fastjson.JSON;
 import org.junit.Assert;
@@ -36,6 +40,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import java.lang.reflect.Method;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -340,5 +345,25 @@ public class RequestMappingHandlerMappingTest extends BaseJunit4Test {
 
         response.getHeaderNames().forEach(headerName ->
                 System.out.println(headerName + ":" + response.getHeader(headerName)));
+    }
+
+    @Test
+    public void resolveViewName() throws Exception {
+        ContentNegotiatingViewResolver negotiatingViewResolver = new ContentNegotiatingViewResolver();
+        negotiatingViewResolver.setViewResolvers(Collections.singletonList(new InternalResourceViewResolver()));
+
+        MockHttpServletRequest request = new MockHttpServletRequest();
+        request.addHeader("Accept", "text/html");
+        RequestContextHolder.setRequest(request);
+
+        View redirectView = negotiatingViewResolver.resolveViewName("redirect:/silently9527.cn");
+        Assert.assertTrue(redirectView instanceof RedirectView); //判断是否返回重定向视图
+
+        View forwardView = negotiatingViewResolver.resolveViewName("forward:/silently9527.cn");
+        Assert.assertTrue(forwardView instanceof InternalResourceView); //
+
+        View view = negotiatingViewResolver.resolveViewName("/silently9527.cn");
+        Assert.assertTrue(view instanceof InternalResourceView); //通过头信息`Accept`，判断是否返回的`InternalResourceView`
+
     }
 }
