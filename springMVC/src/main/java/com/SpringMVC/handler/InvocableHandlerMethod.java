@@ -8,11 +8,13 @@ import org.springframework.core.MethodParameter;
 import org.springframework.core.ParameterNameDiscoverer;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.util.Assert;
+import org.springframework.util.ObjectUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -46,16 +48,46 @@ public class InvocableHandlerMethod extends HandlerMethod{
         this.service=service;
     }
 
+    public InvocableHandlerMethod(Object handler, Method method,
+                                  HandlerMethodArgumentResolverComposite argumentResolver,
+                                  HandlerMethodReturnValueHandlerComposite returnValueHandler,
+                                  ConversionService service){
+        super(handler,method);
+        parameterNameDiscoverer=new DefaultParameterNameDiscoverer();
+        this.argumentResolver=argumentResolver;
+        this.returnValueHandler=returnValueHandler;
+        this.service=service;
+    }
+
+    /**
+     * 检查提供的参数中是否有满足参数类型要求的，有则返回该参数
+     * @param parameter
+     * @param providedArgs
+     * @return
+     */
+    protected Object findProvidedArguments(MethodParameter parameter,Object...providedArgs){
+        if(!ObjectUtils.isEmpty(providedArgs)){
+            Class<?> paramType=parameter.getParameterType();
+            for(Object providedArg:providedArgs){
+                if(paramType.isInstance(providedArg)){
+                    return providedArg;
+                }
+            }
+        }
+        return null;
+    }
     /**
      * 获取处理请求的handler方法的参数列表，并用参数解析器处理
      * @param request
      * @param response
      * @param mavContainer
+     * @param providedArgs
      * @return
      */
     private List<Object> getMethodArgumentValues(HttpServletRequest request,
                                                  HttpServletResponse response,
-                                                 ModelAndViewContainer mavContainer) throws MissingServletRequestParameterException, IOException {
+                                                 ModelAndViewContainer mavContainer,
+                                                 Object...providedArgs) throws MissingServletRequestParameterException, IOException {
         Assert.notNull(argumentResolver,"HandlerMethodArgumentResolver can not be null");
         List<MethodParameter> parameters=this.getParameters();
         //参数解析器处理参数将MethodParameter转为实际的参数
@@ -63,6 +95,13 @@ public class InvocableHandlerMethod extends HandlerMethod{
         for(MethodParameter parameter:parameters){
             //解析参数名称
             parameter.initParameterNameDiscovery(parameterNameDiscoverer);
+            //如果提供的参数中有满足参数类型要求的，则直接选择该参数，不进行解析
+            Object providedArg=findProvidedArguments(parameter,providedArgs);
+            if(providedArg!=null){
+                args.add(providedArg);
+                continue;
+            }
+
             args.add(argumentResolver.resolveArgument(parameter,request,response,mavContainer,service));
         }
         return args;
@@ -82,16 +121,18 @@ public class InvocableHandlerMethod extends HandlerMethod{
      * @param request
      * @param response
      * @param mavContainer
+     * @param providedArgs
      */
     public void invokeAndHandle(HttpServletRequest request,
                                 HttpServletResponse response,
-                                ModelAndViewContainer mavContainer) throws Exception{
-        List<Object> args=getMethodArgumentValues(request,response,mavContainer);
+                                ModelAndViewContainer mavContainer,
+                                Object...providedArgs) throws Exception{
+        List<Object> args=getMethodArgumentValues(request,response,mavContainer,providedArgs);
         Object res=doInvoke(args);
 
         //返回值为空时
         if(res==null){
-            //如果已处理完毕
+            //如果响应是否已经提交
             if(response.isCommitted()){
                 mavContainer.setRequestHandled(true);
                 return;

@@ -47,6 +47,7 @@ public class RequestParamMethodArgumentResolver implements HandlerMethodArgument
                                   ModelAndViewContainer container,
                                   ConversionService service) throws MissingServletRequestParameterException {
         RequestParam requestParam=parameter.getParameterAnnotation(RequestParam.class);
+        //这里没有提供无@RequestParam注解时根据参数名称自动匹配的功能
         if(requestParam==null)return null;
         String name= requestParam.name();
         String value=request.getParameter(name);

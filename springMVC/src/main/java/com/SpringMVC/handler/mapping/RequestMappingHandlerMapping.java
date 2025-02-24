@@ -95,22 +95,6 @@ public class RequestMappingHandlerMapping extends ApplicationObjectSupport imple
                 BeanFactoryUtils.beansOfTypeIncludingAncestors(obtainApplicationContext(),Object.class);
         for(String beanName: beansMap.keySet()){
             Object bean=beansMap.get(beanName);
-            //测试
-//            if(beanName.equals("indexController")||beanName.equals("testController")){
-//                Map<Method, Object> methods = MethodIntrospector.selectMethods(bean.getClass(),
-//                        (MethodIntrospector.MetadataLookup<Object>) method -> {
-//                            // 这里可以根据需要返回方法的元数据
-//                            return method.getName(); // 返回方法名
-//                        });
-//
-//                // 打印所有方法名
-//                methods.forEach((method, name) -> {
-//                    System.out.println("Method name: " + name);
-//                });
-//            }
-
-
-            //测试
 
             if(isHandler(bean)){
                 detectHandlerMethods(beanName,bean);
@@ -139,11 +123,13 @@ public class RequestMappingHandlerMapping extends ApplicationObjectSupport imple
         interceptorList=interceptors;
     }
 
+
     /**
      * 从请求映射到对应的处理链
      * @param request
      * @return
      */
+    @Override
     public HandlerExecutionChain getHandler(HttpServletRequest request) throws NoHandlerFoundException {
 
 //        String url= String.valueOf(request.getRequestURL());

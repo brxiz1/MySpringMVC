@@ -63,7 +63,7 @@ public class RequestMappingHandlerAdapter implements HandlerAdapter, Initializin
      * @return
      */
     private ModelAndView getModelAndView(ModelAndViewContainer mavContainer){
-
+        //如果controller方法标注了@ResponseBody注解，则数据已经都写入response，这里直接返回null
         if(mavContainer.isRequestHandled()){
             return null;
         }
@@ -134,6 +134,7 @@ public class RequestMappingHandlerAdapter implements HandlerAdapter, Initializin
         handlers.add(new ServletRequestMethodArgumentResolver());
         handlers.add(new RequestBodyMethodArgumentResolver());
         handlers.add(new ModelMethodArgumentResolver());
+        handlers.add(new RequestParamMethodArgumentResolver());
         if(!CollectionUtils.isEmpty(argumentResolverList)){
             handlers.addAll(argumentResolverList);
         }
