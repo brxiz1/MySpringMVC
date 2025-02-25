@@ -89,6 +89,7 @@ public class ContentNegotiatingViewResolver implements ViewResolver, Initializin
         }
         return null;
     }
+
     @Override
     public void afterPropertiesSet() throws Exception {
         Assert.notNull(viewResolvers,"viewResolvers can not null");
