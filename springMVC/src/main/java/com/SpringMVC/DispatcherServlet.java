@@ -4,7 +4,6 @@ import com.SpringMVC.exception.ExceptionHandlerExceptionResolver;
 import com.SpringMVC.exception.HandlerExceptionResolver;
 import com.SpringMVC.handler.HandlerExecutionChain;
 import com.SpringMVC.handler.adapter.HandlerAdapter;
-import com.SpringMVC.handler.exception.NoHandlerFoundException;
 import com.SpringMVC.handler.mapping.HandlerMapping;
 import com.SpringMVC.utils.RequestContextHolder;
 import com.SpringMVC.view.View;
@@ -14,7 +13,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
-import org.springframework.util.CollectionUtils;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
